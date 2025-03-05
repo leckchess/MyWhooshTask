@@ -40,6 +40,11 @@ void AHumanCharacter::NotifyControllerChanged()
 	}
 	else
 	{
+		if (Subsystem == nullptr)
+		{
+			Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+		}
+
 		if (Subsystem)
 		{
 			Subsystem->RemoveMappingContext(DefaultMappingContext);

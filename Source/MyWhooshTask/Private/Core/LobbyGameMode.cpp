@@ -1,8 +1,8 @@
 // Copyright Huda Rasmey. All Rights Reserved
 
 
-#include "LobbyGameMode.h"
-#include "MW_GameInstance.h"
+#include "Core/LobbyGameMode.h"
+#include "Core/MW_GameInstance.h"
 
 void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {

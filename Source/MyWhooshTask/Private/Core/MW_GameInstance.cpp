@@ -1,7 +1,7 @@
 // Copyright Huda Rasmey. All Rights Reserved
 
 
-#include "MW_GameInstance.h"
+#include "Core/MW_GameInstance.h"
 #include "Blueprint/UserWidget.h"
 #include "MenuSystem/MainMenu.h"
 #include "MenuSystem/InGameMenu.h"
