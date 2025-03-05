@@ -4,34 +4,35 @@
 
 #include "CoreMinimal.h"
 #include "WheeledVehiclePawn.h"
+#include "../IMovableInterface.h"
 #include "VehicleCharacter.generated.h"
 
 class USpringArmComponent;
 class UCameraComponent;
 class UChaosWheeledVehicleMovementComponent;
 class UInputAction;
-class UEnhancedInputLocalPlayerSubsystem;
 struct FInputActionValue;
 class UInputMappingContext;
 
 UCLASS()
-class MYWHOOSHTASK_API AVehicleCharacter : public AWheeledVehiclePawn
+class MYWHOOSHTASK_API AVehicleCharacter : public AWheeledVehiclePawn, public IIMovableInterface
 {
 	GENERATED_BODY()
 
 public:
 	AVehicleCharacter();
 
+	UInputMappingContext* GetDefaultMappingContext() const override;
+
+	/** map character input to actions */
+	virtual void MapInput(APlayerController* PlayerController) override;
+
+	virtual void Move(const FInputActionValue& Value) override;
+	virtual void Look(const FInputActionValue& Value) override;
+
 protected:
 	/** called when the controller change (possess/ unpossess) */
 	virtual void NotifyControllerChanged() override;
-
-	/** map character input to actions */
-	virtual void MapInput(APlayerController* PlayerController);
-
-private:
-	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
 
 private:
 	/** Camera Spring Arm Component */
@@ -53,9 +54,6 @@ private:
 	/** Look Around Action */
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* LookAction;
-
-	/** cached Subsystem */
-	TObjectPtr<UEnhancedInputLocalPlayerSubsystem> Subsystem;
 
 	/** Chaos Vehicle movement component */
 	TObjectPtr<UChaosWheeledVehicleMovementComponent> ChaosVehicleMovement;

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "../IMovableInterface.h"
 #include "HumanCharacter.generated.h"
 
 class USpringArmComponent;
@@ -15,7 +16,7 @@ class UEnhancedInputLocalPlayerSubsystem;
 struct FInputActionValue;
 
 UCLASS()
-class MYWHOOSHTASK_API AHumanCharacter :public ACharacter
+class MYWHOOSHTASK_API AHumanCharacter :public ACharacter, public IIMovableInterface
 {
 	GENERATED_BODY()
 
@@ -26,13 +27,13 @@ protected:
 	/** called when the controller change (possess/ unpossess) */
 	virtual void NotifyControllerChanged() override;
 
-	virtual void MapInput(APlayerController* PlayerController);
+	UInputMappingContext* GetDefaultMappingContext() const override;
 
-private:
-	virtual void Move(const FInputActionValue& Value);
-	virtual void Look(const FInputActionValue& Value);
+	/** map character input to actions */
+	virtual void MapInput(APlayerController* PlayerController) override;
 
-	void SetupCharacter();
+	virtual void Move(const FInputActionValue& Value) override;
+	virtual void Look(const FInputActionValue& Value) override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Collision")
@@ -65,8 +66,4 @@ private:
 	/** MappingContext */
 	UPROPERTY(EditDefaultsOnly, Category = Input)
 	UInputMappingContext* DefaultMappingContext;
-
-	/** cached Subsystem */
-	TObjectPtr<UEnhancedInputLocalPlayerSubsystem> Subsystem;
-
 };

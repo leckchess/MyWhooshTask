@@ -26,24 +26,7 @@ void AHumanCharacter::NotifyControllerChanged()
 {
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
-		if (Subsystem == nullptr)
-		{
-			Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
-		}
-
-		if (Subsystem)
-		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-			MapInput(PlayerController);
-		}
-
-	}
-	else
-	{
-		if (Subsystem)
-		{
-			Subsystem->RemoveMappingContext(DefaultMappingContext);
-		}
+		SetupPlayerInput(PlayerController);
 	}
 }
 
@@ -51,10 +34,11 @@ void AHumanCharacter::MapInput(APlayerController* PlayerController)
 {
 	if (PlayerController == nullptr) { return; }
 
+	IIMovableInterface::MapInput(PlayerController);
+
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 	{
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AHumanCharacter::Move);
-
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AHumanCharacter::Look);
 
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
@@ -91,24 +75,7 @@ void AHumanCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void AHumanCharacter::SetupCharacter()
+UInputMappingContext* AHumanCharacter::GetDefaultMappingContext() const
 {
-	float NewTargetArmlength = CameraBoom->TargetArmLength;
-	FVector TargetSocketOffset = CameraBoom->TargetOffset;
-
-	if (CameraBoom)
-	{
-		CameraBoom->TargetArmLength = NewTargetArmlength;
-		CameraBoom->SocketOffset = TargetSocketOffset;
-	}
-
-	if (GetCapsuleComponent())
-	{
-		GetCapsuleComponent()->SetCapsuleSize(CapsuleSize.X, CapsuleSize.Y);
-	}
-
-	if (GetCharacterMovement())
-	{
-		GetCharacterMovement()->MaxWalkSpeed = MaxMovementSpeed;
-	}
+	return DefaultMappingContext;
 }

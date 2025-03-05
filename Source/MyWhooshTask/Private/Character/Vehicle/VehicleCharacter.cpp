@@ -38,23 +38,7 @@ void AVehicleCharacter::NotifyControllerChanged()
 {
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
-		if (Subsystem == nullptr)
-		{
-			Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
-		}
-
-		if (Subsystem)
-		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-			MapInput(PlayerController);
-		}
-	}
-	else
-	{
-		if (Subsystem)
-		{
-			Subsystem->RemoveMappingContext(DefaultMappingContext);
-		}
+		SetupPlayerInput(PlayerController);
 	}
 }
 
@@ -84,4 +68,9 @@ void AVehicleCharacter::Look(const FInputActionValue& Value)
 
 	float LookValue = Value.Get<FVector2D>().X;
 	ChaosVehicleMovement->SetSteeringInput(LookValue);
+}
+
+UInputMappingContext* AVehicleCharacter::GetDefaultMappingContext() const
+{
+	return DefaultMappingContext;
 }
