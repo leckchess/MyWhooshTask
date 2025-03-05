@@ -1,6 +1,6 @@
 // Copyright Huda Rasmey. All Rights Reserved.
 
-#include "Character/HumanCharacter.h"
+#include "Character/Human/HumanCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"

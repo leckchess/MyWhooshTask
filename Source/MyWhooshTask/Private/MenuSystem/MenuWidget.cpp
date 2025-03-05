@@ -8,10 +8,10 @@ void UMenuWidget::Setup()
 	AddToViewport();
 
 	UWorld* World = GetWorld();
-	if (!ensure(World != nullptr)) return;
+	if (World == nullptr) { return; }
 
 	APlayerController* PlayerController = World->GetFirstPlayerController();
-	if (!ensure(PlayerController != nullptr)) return;
+	if (PlayerController == nullptr) { return; }
 
 	FInputModeUIOnly InputMode;
 	InputMode.SetWidgetToFocus(TakeWidget());
@@ -25,10 +25,10 @@ void UMenuWidget::Destroy()
 	RemoveFromParent();
 
 	UWorld* World = GetWorld();
-	if (!ensure(World != nullptr)) return;
+	if (World == nullptr) { return; }
 
 	APlayerController* PlayerController = World->GetFirstPlayerController();
-	if (!ensure(PlayerController != nullptr)) return;
+	if (PlayerController == nullptr) { return; }
 
 	FInputModeGameOnly InputMode;
 	PlayerController->SetInputMode(InputMode);

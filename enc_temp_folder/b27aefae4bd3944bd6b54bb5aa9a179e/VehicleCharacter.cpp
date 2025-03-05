@@ -1,11 +1,13 @@
 // Copyright Huda Rasmey. All Rights Reserved.
 
-#include "Character/VehicleCharacter.h"
+#include "Character/Vehicle/VehicleCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInput/Public/InputActionValue.h"
 #include "EnhancedInput/Public/EnhancedInputComponent.h"
-#include "ChaosVehicleMovementComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
+#include "ChaosWheeledVehicleMovementComponent.h"
 
 AVehicleCharacter::AVehicleCharacter()
 {
@@ -26,7 +28,39 @@ AVehicleCharacter::AVehicleCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
+	ChaosVehicleMovement = CastChecked<UChaosWheeledVehicleMovementComponent>(GetVehicleMovement());
+
+
 	bReplicates = true;
+}
+
+void AVehicleCharacter::NotifyControllerChanged()
+{
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if (Subsystem == nullptr)
+		{
+			Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+		}
+
+		if (Subsystem)
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			MapInput(PlayerController);
+		}
+	}
+	else
+	{
+		if (Subsystem == nullptr)
+		{
+			Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+		}
+
+		if (Subsystem)
+		{
+			Subsystem->RemoveMappingContext(DefaultMappingContext);
+		}
+	}
 }
 
 void AVehicleCharacter::MapInput(APlayerController* PlayerController)
@@ -40,58 +74,19 @@ void AVehicleCharacter::MapInput(APlayerController* PlayerController)
 	}
 }
 
-bool AVehicleCharacter::Server_SetThrottle_Validate(float Value)
-{
-	return true;
-}
-
-void AVehicleCharacter::Server_SetThrottle_Implementation(float Value)
-{
-	if (GetVehicleMovement() == nullptr) { return; }
-
-	GetVehicleMovement()->SetThrottleInput(Value);
-}
-
-bool AVehicleCharacter::Server_SetSteering_Validate(float Value)
-{
-	return true;
-}
-
-void AVehicleCharacter::Server_SetSteering_Implementation(float Value)
-{
-	if (GetVehicleMovement() == nullptr) { return; }
-
-	GetVehicleMovement()->SetSteeringInput(Value);
-}
-
 void AVehicleCharacter::Move(const FInputActionValue& Value)
 {
-	if (GetVehicleMovement() == nullptr) { return; }
+	if (ChaosVehicleMovement == nullptr) { return; }
 
 	float MovementValue = Value.Get<FVector2D>().Y;
-
-	if (HasAuthority())
-	{
-		GetVehicleMovement()->SetThrottleInput(MovementValue);
-	}
-	else
-	{
-		Server_SetThrottle(MovementValue);
-	}
+	MovementValue = FMath::Clamp(MovementValue, 0, MovementValue);
+	ChaosVehicleMovement->SetThrottleInput(MovementValue);
 }
 
 void AVehicleCharacter::Look(const FInputActionValue& Value)
 {
-	if (GetVehicleMovement() == nullptr) { return; }
+	if (ChaosVehicleMovement == nullptr) { return; }
 
 	float LookValue = Value.Get<FVector2D>().X;
-
-	if (HasAuthority())
-	{
-		GetVehicleMovement()->SetSteeringInput(LookValue);
-	}
-	else
-	{
-		Server_SetSteering(LookValue);
-	}
+	ChaosVehicleMovement->SetSteeringInput(LookValue);
 }

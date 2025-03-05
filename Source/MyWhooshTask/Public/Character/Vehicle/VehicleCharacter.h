@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "WheeledVehiclePawn.h"
-#include "Net/UnrealNetwork.h"
 #include "VehicleCharacter.generated.h"
 
 class USpringArmComponent;
@@ -13,6 +12,7 @@ class UChaosWheeledVehicleMovementComponent;
 class UInputAction;
 class UEnhancedInputLocalPlayerSubsystem;
 struct FInputActionValue;
+class UInputMappingContext;
 
 UCLASS()
 class MYWHOOSHTASK_API AVehicleCharacter : public AWheeledVehiclePawn
@@ -23,14 +23,11 @@ public:
 	AVehicleCharacter();
 
 protected:
+	/** called when the controller change (possess/ unpossess) */
+	virtual void NotifyControllerChanged() override;
+
 	/** map character input to actions */
 	virtual void MapInput(APlayerController* PlayerController);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetThrottle(float Value);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetSteering(float Value);
 
 private:
 	void Move(const FInputActionValue& Value);
@@ -45,6 +42,10 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FollowCamera;
 
+	/** MappingContext */
+	UPROPERTY(EditDefaultsOnly, Category = Input)
+	UInputMappingContext* DefaultMappingContext;
+
 	/** Look Around Action */
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* MoveAction;
@@ -52,4 +53,10 @@ private:
 	/** Look Around Action */
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* LookAction;
+
+	/** cached Subsystem */
+	TObjectPtr<UEnhancedInputLocalPlayerSubsystem> Subsystem;
+
+	/** Chaos Vehicle movement component */
+	TObjectPtr<UChaosWheeledVehicleMovementComponent> ChaosVehicleMovement;
 };
