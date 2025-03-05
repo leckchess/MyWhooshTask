@@ -13,13 +13,13 @@
 UMainMenu::UMainMenu(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
 {
-	FString ServerRowWidgetBP_FilePath = FPaths::ProjectDir() + "Content/MenuSystem/BluePrints/WBP_ServerRow.uasset";
+	FString ServerRowWidgetBP_FilePath = FPaths::ProjectDir() + "Content/MenuSystem/Blueprints/WBP_ServerRow.uasset";
 	if (FPaths::FileExists(ServerRowWidgetBP_FilePath) == false)
 	{
 		return;
 	}
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> ServerRowWidgetBP(TEXT("/Game/MenuSystem/BluePrints/WBP_ServerRow"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> ServerRowWidgetBP(TEXT("/Game/MenuSystem/Blueprints/WBP_ServerRow"));
 
 	if (!ensure(ServerRowWidgetBP.Class != nullptr)) { return; }
 

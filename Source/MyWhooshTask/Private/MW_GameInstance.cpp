@@ -19,20 +19,20 @@ const static int32 CONNECTION_NUMBER = 2;
 UMW_GameInstance::UMW_GameInstance(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
 {
-	FString MainMenuWidgetBP_FilePath = FPaths::ProjectDir() + "Content/MenuSystem/BluePrints/WBP_MainMenu.uasset";
+	FString MainMenuWidgetBP_FilePath = FPaths::ProjectDir() + "Content/MenuSystem/Blueprints/WBP_MainMenu.uasset";
 	if (FPaths::FileExists(MainMenuWidgetBP_FilePath))
 	{
-		static ConstructorHelpers::FClassFinder<UUserWidget> MainMenuWidgetBP(TEXT("/Game/MenuSystem/BluePrints/WBP_MainMenu"));
+		static ConstructorHelpers::FClassFinder<UUserWidget> MainMenuWidgetBP(TEXT("/Game/MenuSystem/Blueprints/WBP_MainMenu"));
 
 		if (!ensure(MainMenuWidgetBP.Class != nullptr)) { return; }
 
 		MainMenuWidgetClass = MainMenuWidgetBP.Class;
 	}
 
-	FString InGameMenuWidgetBP_FilePath = FPaths::ProjectDir() + "Content/MenuSystem/BluePrints/WBP_InGameMenu.uasset";
+	FString InGameMenuWidgetBP_FilePath = FPaths::ProjectDir() + "Content/MenuSystem/Blueprints/WBP_InGameMenu.uasset";
 	if (FPaths::FileExists(InGameMenuWidgetBP_FilePath))
 	{
-		static ConstructorHelpers::FClassFinder<UUserWidget> InGameMenuWidgetBP(TEXT("/Game/MenuSystem/BluePrints/WBP_InGameMenu"));
+		static ConstructorHelpers::FClassFinder<UUserWidget> InGameMenuWidgetBP(TEXT("/Game/MenuSystem/Blueprints/WBP_InGameMenu"));
 
 		if (!ensure(InGameMenuWidgetBP.Class != nullptr)) { return; }
 
@@ -146,7 +146,7 @@ void UMW_GameInstance::RequestServerList()
 		SessionSearch->bIsLanQuery = true;
 
 		SessionSearch->MaxSearchResults = 100;
-		SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+		SessionSearch->QuerySettings.Set(SEARCH_KEYWORDS, true, EOnlineComparisonOp::Equals);
 		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 	}
 }
