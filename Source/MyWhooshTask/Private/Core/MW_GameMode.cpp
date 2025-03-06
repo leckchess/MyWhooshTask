@@ -39,7 +39,7 @@ void AMW_GameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 
 bool AMW_GameMode::LoadPawnsData()
 {
-	if (CharactersPawnsDataTable == nullptr) { return false; }
+	if (CharactersPawnsDataTable == nullptr && TryGetCharactersPawnData() == false) { return false; }
 
 	const TMap<FName, uint8*>& AllRows = CharactersPawnsDataTable->GetRowMap();
 
@@ -62,4 +62,10 @@ FCharacterPawnsData* AMW_GameMode::GetRandomPawnData()
 	CharacterPawns.GetKeys(PawnsTags);
 
 	return CharacterPawns[PawnsTags[FMath::RandRange(0, PawnsTags.Num() - 1)]];
+}
+
+bool AMW_GameMode::TryGetCharactersPawnData()
+{
+	CharactersPawnsDataTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, TEXT("/Game/Blueprints/DataTables/DT_Characters.DT_Characters")));
+	return CharactersPawnsDataTable != nullptr;
 }

@@ -67,6 +67,8 @@ protected:
 private:
 	bool LoadPawnsData();
 	FCharacterPawnsData* GetRandomPawnData();
+	/** Get datatable dynamically in case using a gamemode class instead of bp */
+	bool TryGetCharactersPawnData();
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Character Pawns")

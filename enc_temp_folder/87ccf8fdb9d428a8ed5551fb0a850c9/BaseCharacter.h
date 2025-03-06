@@ -23,7 +23,6 @@ class MYWHOOSHTASK_API ABaseCharacter :public ACharacter, public IIMovableInterf
 public:
 	ABaseCharacter();
 
-	float GeatLeaningValue() { return LeaningValue; }
 protected:
 	/** called when the controller change (possess/ unpossess) */
 	virtual void NotifyControllerChanged() override;
@@ -67,6 +66,4 @@ private:
 	/** MappingContext */
 	UPROPERTY(EditDefaultsOnly, Category = Input)
 	UInputMappingContext* DefaultMappingContext;
-
-	float LeaningValue;
 };

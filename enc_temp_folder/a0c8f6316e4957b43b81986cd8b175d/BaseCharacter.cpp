@@ -61,8 +61,6 @@ void ABaseCharacter::Move(const FInputActionValue& Value)
 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
-
-		LeaningValue = MovementVector.X;
 	}
 }
 
