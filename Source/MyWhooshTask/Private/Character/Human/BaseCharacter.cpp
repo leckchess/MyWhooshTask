@@ -1,6 +1,6 @@
 // Copyright Huda Rasmey. All Rights Reserved.
 
-#include "Character/Human/HumanCharacter.h"
+#include "Character/Human/BaseCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -8,7 +8,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInput/Public/EnhancedInputSubsystems.h"
 
-AHumanCharacter::AHumanCharacter()
+ABaseCharacter::ABaseCharacter()
 {
 	// Create Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -22,7 +22,7 @@ AHumanCharacter::AHumanCharacter()
 	FollowCamera->bUsePawnControlRotation = false;
 }
 
-void AHumanCharacter::NotifyControllerChanged()
+void ABaseCharacter::NotifyControllerChanged()
 {
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
@@ -30,7 +30,7 @@ void AHumanCharacter::NotifyControllerChanged()
 	}
 }
 
-void AHumanCharacter::MapInput(APlayerController* PlayerController)
+void ABaseCharacter::MapInput(APlayerController* PlayerController)
 {
 	if (PlayerController == nullptr) { return; }
 
@@ -38,15 +38,15 @@ void AHumanCharacter::MapInput(APlayerController* PlayerController)
 
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 	{
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AHumanCharacter::Move);
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AHumanCharacter::Look);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABaseCharacter::Move);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABaseCharacter::Look);
 
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 	}
 }
 
-void AHumanCharacter::Move(const FInputActionValue& Value)
+void ABaseCharacter::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
@@ -64,7 +64,7 @@ void AHumanCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
-void AHumanCharacter::Look(const FInputActionValue& Value)
+void ABaseCharacter::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
@@ -75,7 +75,7 @@ void AHumanCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-UInputMappingContext* AHumanCharacter::GetDefaultMappingContext() const
+UInputMappingContext* ABaseCharacter::GetDefaultMappingContext() const
 {
 	return DefaultMappingContext;
 }

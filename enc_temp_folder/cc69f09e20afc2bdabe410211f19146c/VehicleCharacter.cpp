@@ -58,9 +58,14 @@ void AVehicleCharacter::Move(const FInputActionValue& Value)
 	if (ChaosVehicleMovement == nullptr) { return; }
 
 	float MovementValue = Value.Get<FVector2D>().Y;
-	ChaosVehicleMovement->SetThrottleInput(MovementValue);
-
-	ChaosVehicleMovement->SetBrakeInput(MovementValue < 0 ? 1 : 0);
+	if (MovementValue > 0)
+	{
+		ChaosVehicleMovement->SetThrottleInput(MovementValue);
+	}
+	else
+	{
+		ChaosVehicleMovement->SetBrakeInput(MovementValue * -1);
+	}
 }
 
 void AVehicleCharacter::Look(const FInputActionValue& Value)

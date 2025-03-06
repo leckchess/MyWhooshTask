@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "../IMovableInterface.h"
-#include "HumanCharacter.generated.h"
+#include "BaseCharacter.generated.h"
 
 class USpringArmComponent;
 class UCameraComponent;
@@ -16,12 +16,12 @@ class UEnhancedInputLocalPlayerSubsystem;
 struct FInputActionValue;
 
 UCLASS()
-class MYWHOOSHTASK_API AHumanCharacter :public ACharacter, public IIMovableInterface
+class MYWHOOSHTASK_API ABaseCharacter :public ACharacter, public IIMovableInterface
 {
 	GENERATED_BODY()
 
 public:
-	AHumanCharacter();
+	ABaseCharacter();
 
 protected:
 	/** called when the controller change (possess/ unpossess) */
