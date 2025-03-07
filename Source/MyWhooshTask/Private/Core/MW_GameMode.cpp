@@ -17,7 +17,7 @@ AMW_GameMode::AMW_GameMode()
 
 void AMW_GameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot)
 {
-	if (IsRunningDedicatedServer() == false)
+	if (NewPlayer->IsLocalController() == false)
 	{
 		FCharacterPawnsData* RandomPawnData = GetRandomPawnData();
 		if (RandomPawnData)
@@ -31,7 +31,7 @@ void AMW_GameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 	else
 	{
 		DefaultPawnClass = CachedDefaultPawnClass;
-		UE_LOG(LogGameMode, Verbose, TEXT("FinishRestartPlayer: Can't assign random pawn in dedicated!"));
+		UE_LOG(LogGameMode, Verbose, TEXT("FinishRestartPlayer: Can't assign random pawn in Server"));
 	}
 
 	Super::RestartPlayerAtPlayerStart(NewPlayer, StartSpot);

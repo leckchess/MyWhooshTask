@@ -1,6 +1,5 @@
 // Copyright Huda Rasmey. All Rights Reserved
 
-
 #include "Core/LobbyGameMode.h"
 #include "Core/MW_GameInstance.h"
 
@@ -36,6 +35,18 @@ void ALobbyGameMode::Logout(AController* Exiting)
 	if (World->GetTimerManager().IsTimerActive(StartGame_Handle))
 	{
 		World->GetTimerManager().ClearTimer(StartGame_Handle);
+	}
+
+	UMW_GameInstance* GameInstance = Cast<UMW_GameInstance>(GetGameInstance());
+
+	if (GameInstance)
+	{
+		if (Exiting->IsLocalController())
+		{
+			GameInstance->DisconnectAllPlayers();
+		}
+
+		GameInstance->OnPlayerLogout(Exiting);
 	}
 }
 

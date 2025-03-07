@@ -63,6 +63,7 @@ void UMW_GameInstance::Init()
 		{
 			SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UMW_GameInstance::OnCreateSessionComplete);
 			SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UMW_GameInstance::OnJoinSessionComplete);
+			//SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UMW_GameInstance::OnDestroySessionComplete);
 			SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UMW_GameInstance::OnFindFriendSessionComplete);
 		}
 	}

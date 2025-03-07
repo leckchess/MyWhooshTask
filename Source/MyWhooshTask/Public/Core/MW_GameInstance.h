@@ -38,17 +38,26 @@ public:
 
 	virtual void RequestServerList() override;
 
+	void OnPlayerLogout(AController* LogoutController);
+
 	void StartSession();
 
 	int32 GetMaxNumberOfPlayers();
+
+	void DisconnectAllPlayers();
+
+	/** server disconnected */
+	void Shutdown() override;
+
 private:
 	void CreateSession();
 
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
 	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
-	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
+	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful, uint32 Index);
 	void OnFindFriendSessionComplete(bool bWasSuccessful);
 
+	/** on server crashes */
 	void OnNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type NetworkFailureType, const FString& Message);
 
 private:
