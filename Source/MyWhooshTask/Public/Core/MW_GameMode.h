@@ -27,17 +27,7 @@ protected:
 
 	void Logout(AController* Exiting) override;
 
-private:
-	bool LoadPawnsData();
-	FCharacterPawnsData* GetRandomPawnData();
-	/** Get datatable dynamically in case using a gamemode class instead of bp */
-	bool TryGetCharactersPawnData();
-
 	void StartGame();
-
-public:
-	UPROPERTY(EditAnywhere, Category = "Character Pawns")
-	UDataTable* CharactersPawnsDataTable;
 
 private:
 	FTimerHandle StartGame_Handle;

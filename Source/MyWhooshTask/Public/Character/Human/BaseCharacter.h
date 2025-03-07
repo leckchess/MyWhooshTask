@@ -9,7 +9,6 @@
 
 class USpringArmComponent;
 class UCameraComponent;
-class UControllableComponent;
 class UInputAction;
 class UInputMappingContext;
 class UEnhancedInputLocalPlayerSubsystem;
@@ -24,15 +23,18 @@ public:
 	ABaseCharacter();
 
 	float GeatLeaningValue() { return LeaningValue; }
+	USpringArmComponent* GetCameraBoom(){return CameraBoom;}
+
 protected:
 	/** called when the controller change (possess/ unpossess) */
 	virtual void NotifyControllerChanged() override;
 
+	/** IIMovableInterface */
+	/** Get default mapping context */
 	UInputMappingContext* GetDefaultMappingContext() const override;
-
 	/** map character input to actions */
 	virtual void MapInput(APlayerController* PlayerController) override;
-
+	/** override character movement */
 	virtual void Move(const FInputActionValue& Value) override;
 	virtual void Look(const FInputActionValue& Value) override;
 
