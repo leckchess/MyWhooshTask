@@ -8,6 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "ChaosWheeledVehicleMovementComponent.h"
+#include "Core/MW_GameStateBase.h"
 
 AVehicleCharacter::AVehicleCharacter()
 {
@@ -32,6 +33,13 @@ AVehicleCharacter::AVehicleCharacter()
 
 
 	bReplicates = true;
+}
+
+void AVehicleCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	TryApplyCustomization();
 }
 
 void AVehicleCharacter::NotifyControllerChanged()
@@ -69,6 +77,65 @@ void AVehicleCharacter::Look(const FInputActionValue& Value)
 
 	float LookValue = Value.Get<FVector2D>().X;
 	ChaosVehicleMovement->SetSteeringInput(LookValue);
+}
+
+void AVehicleCharacter::TryApplyCustomization()
+{
+	if (GetLocalRole() == ROLE_Authority) { return; }
+
+	if (AMW_GameStateBase* MW_GameState = GetWorld()->GetGameState<AMW_GameStateBase>())
+	{
+		if (MW_GameState->GetPawnTag().IsValid())
+		{
+			ApplyCustomization(MW_GameState->GetCurrentPawnData());
+		}
+		else
+		{
+			// in case replication is delayed
+			GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AVehicleCharacter::TryApplyCustomization);
+		}
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AVehicleCharacter::TryApplyCustomization);
+	}
+}
+
+void AVehicleCharacter::ApplyCustomization(FCharacterPawnsData* CustomizationData)
+{
+	if (CustomizationData == nullptr) { return; }
+
+	if (USkeletalMeshComponent* SkeletalMeshComp = GetMesh())
+	{
+		if (CustomizationData->OverrideMesh)
+		{
+			SkeletalMeshComp->SetSkeletalMesh(Cast<USkeletalMesh>(CustomizationData->OverrideMesh));
+		}
+
+		if (CustomizationData->OverrideAnimationClass)
+		{
+			SkeletalMeshComp->SetAnimInstanceClass(CustomizationData->OverrideAnimationClass);
+			SkeletalMeshComp->InitAnim(true);
+		}
+
+		if (CustomizationData->bOverridePawnTransform)
+		{
+			SkeletalMeshComp->SetRelativeLocation(CustomizationData->OverrideMeshLocation);
+			SkeletalMeshComp->SetRelativeRotation(FRotator::MakeFromEuler(CustomizationData->OverrideMeshRotation));
+			SkeletalMeshComp->SetRelativeScale3D(CustomizationData->OverideMeshScale);
+		}
+
+		SkeletalMeshComp->RecreateRenderState_Concurrent();
+	}
+
+	if (CustomizationData->bOverrideCameraSetup)
+	{
+		if (CameraBoom)
+		{
+			CameraBoom->TargetArmLength = CustomizationData->OverrideCameraTargetArmLength;
+			CameraBoom->SocketOffset = CustomizationData->OverrideCameraSocketOffset;
+		}
+	}
 }
 
 UInputMappingContext* AVehicleCharacter::GetDefaultMappingContext() const

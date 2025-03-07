@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "WheeledVehiclePawn.h"
 #include "../IMovableInterface.h"
+#include "../ICusomizableInterface.h"
 #include "VehicleCharacter.generated.h"
 
 class USpringArmComponent;
@@ -15,12 +16,14 @@ struct FInputActionValue;
 class UInputMappingContext;
 
 UCLASS()
-class MYWHOOSHTASK_API AVehicleCharacter : public AWheeledVehiclePawn, public IIMovableInterface
+class MYWHOOSHTASK_API AVehicleCharacter : public AWheeledVehiclePawn, public IIMovableInterface, public IICusomizableInterface
 {
 	GENERATED_BODY()
 
 public:
 	AVehicleCharacter();
+
+	virtual void BeginPlay() override;
 
 	UInputMappingContext* GetDefaultMappingContext() const override;
 
@@ -30,9 +33,16 @@ public:
 	virtual void Move(const FInputActionValue& Value) override;
 	virtual void Look(const FInputActionValue& Value) override;
 
+
+	/** IICusomizableInterface */
+	void ApplyCustomization(FCharacterPawnsData* CustomizationData) override;
+
 protected:
 	/** called when the controller change (possess/ unpossess) */
 	virtual void NotifyControllerChanged() override;
+
+private:
+	void TryApplyCustomization();
 
 private:
 	/** Camera Spring Arm Component */
