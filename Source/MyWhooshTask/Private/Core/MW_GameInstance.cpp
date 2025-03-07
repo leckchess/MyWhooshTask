@@ -12,6 +12,7 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/OnlineReplStructs.h"
+#include "Engine/DataTable.h"
 
 //PRAGMA_DISABLE_OPTIMIZATION_ACTUAL
 
@@ -382,4 +383,22 @@ void UMW_GameInstance::CreateSession()
 		SessionInterface->CreateSession(0, NAME_GameSession, SessionSettings);
 	}
 }
+
+bool UMW_GameInstance::LoadPawnsData(UDataTable* CharactersPawnsDataTable)
+{
+	if (CharactersPawnsDataTable == nullptr) { return false; }
+
+	const TMap<FName, uint8*>& AllRows = CharactersPawnsDataTable->GetRowMap();
+
+	for (TMap<FName, uint8*>::TConstIterator RowMapIter(AllRows.CreateConstIterator()); RowMapIter; ++RowMapIter)
+	{
+		if (FCharacterPawnsData* CharacterPawnData = reinterpret_cast<FCharacterPawnsData*>(RowMapIter.Value()))
+		{
+			CharacterPawns.Add(CharacterPawnData->PawnTag, CharacterPawnData);
+		}
+	}
+
+	return CharacterPawns.Num() > 0;
+}
+
 //PRAGMA_ENABLE_OPTIMIZATION_ACTUAL
