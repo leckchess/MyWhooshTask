@@ -85,15 +85,15 @@ void AVehicleCharacter::TryApplyCustomization()
 
 	if (AMW_GameStateBase* MW_GameState = GetWorld()->GetGameState<AMW_GameStateBase>())
 	{
-		if (MW_GameState->GetPawnTag().IsValid())
-		{
-			ApplyCustomization(MW_GameState->GetCurrentPawnData());
-		}
-		else
-		{
-			// in case replication is delayed
-			GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AVehicleCharacter::TryApplyCustomization);
-		}
+		//if (MW_GameState->GetPawnTag().IsValid())
+		//{
+		//	ApplyCustomization(MW_GameState->GetCurrentPawnData());
+		//}
+		//else
+		//{
+		//	// in case replication is delayed
+		//	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AVehicleCharacter::TryApplyCustomization);
+		//}
 	}
 	else
 	{

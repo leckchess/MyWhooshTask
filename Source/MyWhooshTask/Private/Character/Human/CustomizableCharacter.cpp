@@ -36,7 +36,7 @@ void ACustomizableCharacter::ApplyCustomization(FCharacterPawnsData* Customizati
 			SkeletalMeshComp->SetRelativeScale3D(CustomizationData->OverideMeshScale);
 		}
 
-		SkeletalMeshComp->RecreateRenderState_Concurrent(); 
+		SkeletalMeshComp->RecreateRenderState_Concurrent();
 	}
 
 	if (CustomizationData->bOverrideCameraSetup)
@@ -51,22 +51,10 @@ void ACustomizableCharacter::ApplyCustomization(FCharacterPawnsData* Customizati
 
 void ACustomizableCharacter::TryApplyCustomization()
 {
-	if (GetLocalRole() == ROLE_Authority) { return; }
+	if (GetLocalRole() == ROLE_Authority && IsLocallyControlled()) { return; }
 
 	if (AMW_GameStateBase* MW_GameState = GetWorld()->GetGameState<AMW_GameStateBase>())
 	{
-		if (MW_GameState->GetPawnTag().IsValid())
-		{
-			ApplyCustomization(MW_GameState->GetCurrentPawnData());
-		}
-		else
-		{
-			// in case replication is delayed
-			GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ACustomizableCharacter::TryApplyCustomization);
-		}
-	}
-	else
-	{
-		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ACustomizableCharacter::TryApplyCustomization);
+		ApplyCustomization(MW_GameState->GetPawnDataByNetworkId(ActorID));
 	}
 }

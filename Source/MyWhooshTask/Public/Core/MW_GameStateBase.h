@@ -5,9 +5,29 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameplayTagContainer.h"
+#include "Net/Serialization/FastArraySerializer.h"
 #include "MW_GameStateBase.generated.h"
 
 class UDataTable;
+
+USTRUCT(BlueprintType)
+struct FPawnsMapping
+{
+	GENERATED_BODY()
+
+public:
+	// Unique identifier for networking (GUID)
+	UPROPERTY(EditAnywhere)
+	uint64 NetworkGUID;
+
+	// Pawn Gameplay tag
+	UPROPERTY(EditAnywhere)
+	FGameplayTag GameplayTag;
+
+	FPawnsMapping() {}
+
+	FPawnsMapping(uint64 InNetworkId, FGameplayTag InPawnTag) : NetworkGUID(InNetworkId), GameplayTag(InPawnTag) {}
+};
 
 USTRUCT(BlueprintType)
 struct FCharacterPawnsData : public FTableRowBase
@@ -53,30 +73,32 @@ UCLASS()
 class MYWHOOSHTASK_API AMW_GameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	FCharacterPawnsData* GetRandomPawnData();
 	FCharacterPawnsData* GetPawnDataByTag(const FGameplayTag& PawnTag);
-	FCharacterPawnsData* GetCurrentPawnData();
 
-	void SetPawnTag(FGameplayTag InPawnTag);
-	FGameplayTag GetPawnTag() { return PawnTag; }
+	FCharacterPawnsData* GetPawnDataByNetworkId(uint64 NetworkId);
+	FGameplayTag GetPawnTagByNetworkId(uint64 NetworkId);
+
+	void AssignPawnData(uint64 NetworkId, FGameplayTag pawnTag);
 
 	UFUNCTION()
-	void OnRep_PawnTag();
+	void OnRep_PawnsMappingArray();
 
 private:
 	bool LoadPawnsData();
 
-	/** Get datatable dynamically in case using a gamemode class instead of bp */
+	/** Get datatable dynamically in case using a class class instead of bp */
 	bool TryGetCharactersPawnData();
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Character Pawns")
 	UDataTable* CharactersPawnsDataTable;
 
-	UPROPERTY(ReplicatedUsing = OnRep_PawnTag)
-	FGameplayTag PawnTag;
+	UPROPERTY(ReplicatedUsing = OnRep_PawnsMappingArray)
+	TArray<FPawnsMapping> PawnsMappingArray;
+
 private:
 	TMap<FGameplayTag, FCharacterPawnsData*> CharacterPawns;
 

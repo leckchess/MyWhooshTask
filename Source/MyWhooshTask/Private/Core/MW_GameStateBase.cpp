@@ -16,34 +16,39 @@ FCharacterPawnsData* AMW_GameStateBase::GetRandomPawnData()
 
 FCharacterPawnsData* AMW_GameStateBase::GetPawnDataByTag(const FGameplayTag& InPawnTag)
 {
+	if (InPawnTag.IsValid() == false) { return nullptr; }
+
 	if (CharacterPawns.Num() == 0 && LoadPawnsData() == false) { return nullptr; }
 
 	return CharacterPawns[InPawnTag];
 }
 
-FCharacterPawnsData* AMW_GameStateBase::GetCurrentPawnData()
+FCharacterPawnsData* AMW_GameStateBase::GetPawnDataByNetworkId(uint64 NetworkId)
 {
-	return GetPawnDataByTag(PawnTag);
+	return GetPawnDataByTag(GetPawnTagByNetworkId(NetworkId));
 }
 
-void AMW_GameStateBase::SetPawnTag(FGameplayTag InPawnTag)
+FGameplayTag AMW_GameStateBase::GetPawnTagByNetworkId(uint64 NetworkId)
 {
-	if (HasAuthority())
+	for (const FPawnsMapping& PawnMappingData : PawnsMappingArray)
 	{
-		PawnTag = InPawnTag;
-	}
-}
-
-void AMW_GameStateBase::OnRep_PawnTag()
-{
-	if (PawnTag.IsValid())
-	{
-		FCharacterPawnsData* data = GetPawnDataByTag(PawnTag);
-		if (data)
+		if (PawnMappingData.NetworkGUID == NetworkId)
 		{
-			UE_LOG(LogTemp,Error,TEXT("Data"));
+			return PawnMappingData.GameplayTag;
 		}
 	}
+
+	return FGameplayTag{};
+}
+
+void AMW_GameStateBase::AssignPawnData(uint64 NetworkId, FGameplayTag pawnTag)
+{
+	PawnsMappingArray.Add(FPawnsMapping{ NetworkId, pawnTag });
+}
+
+void AMW_GameStateBase::OnRep_PawnsMappingArray()
+{
+	UE_LOG(LogTemp, Error, TEXT("Array Replication %d"), PawnsMappingArray.Num());
 }
 
 bool AMW_GameStateBase::LoadPawnsData()
@@ -72,5 +77,5 @@ bool AMW_GameStateBase::TryGetCharactersPawnData()
 void AMW_GameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AMW_GameStateBase, PawnTag);
+	DOREPLIFETIME(AMW_GameStateBase, PawnsMappingArray);
 }

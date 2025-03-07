@@ -47,10 +47,6 @@ public:
 	/** server disconnected */
 	void Shutdown() override;
 
-	void SetCachedRandomPawnDataTag(FGameplayTag InCachedRandomPawnDataTag) { CachedRandomPawnDataTag = InCachedRandomPawnDataTag; }
-
-	FGameplayTag GetCachedRandomPawnDataTag() { return CachedRandomPawnDataTag; }
-
 private:
 	void CreateSession();
 
@@ -61,6 +57,9 @@ private:
 
 	/** on server crashes */
 	void OnNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type NetworkFailureType, const FString& Message);
+
+public:
+	TMap<uint64, FGameplayTag> MappedRandomPawnes;
 
 private:
 	TSubclassOf<class UUserWidget> MainMenuWidgetClass;
@@ -73,6 +72,4 @@ private:
 
 	FString DesiredServerName;
 	FString DesiredHostName;
-
-	FGameplayTag CachedRandomPawnDataTag;
 };

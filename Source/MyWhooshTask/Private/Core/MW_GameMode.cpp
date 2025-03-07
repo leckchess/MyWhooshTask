@@ -4,6 +4,8 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Core/MW_GameInstance.h"
 #include "Core/MW_GameStateBase.h"
+#include "GameFramework/PlayerState.h"
+#include "Character/Human/BaseCharacter.h"
 
 //PRAGMA_DISABLE_OPTIMIZATION_ACTUAL
 AMW_GameMode::AMW_GameMode()
@@ -25,14 +27,16 @@ void AMW_GameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 		if (AMW_GameStateBase* MWGameState = GetGameState<AMW_GameStateBase>())
 		{
 			UMW_GameInstance* GameInstance = Cast<UMW_GameInstance>(GetGameInstance());
-			FGameplayTag ChachedRandPawnDataTag = GameInstance ? GameInstance->GetCachedRandomPawnDataTag() : FGameplayTag();
+			const FUniqueNetIdRepl& NewPlayerStateUniqueId = NewPlayer->PlayerState->GetUniqueId();
+			uint32 NumericID = GetTypeHash(*NewPlayerStateUniqueId);
+
+			FGameplayTag ChachedRandPawnDataTag = GameInstance && GameInstance->MappedRandomPawnes.Contains(NumericID) ? GameInstance->MappedRandomPawnes[NumericID] : FGameplayTag();
 
 			FCharacterPawnsData* RandomPawnData = ChachedRandPawnDataTag.IsValid() ? MWGameState->GetPawnDataByTag(ChachedRandPawnDataTag) : MWGameState->GetRandomPawnData();
 			if (RandomPawnData && RandomPawnData->Pawn)
 			{
 				DefaultPawnClass = RandomPawnData->Pawn;
-				GameInstance->SetCachedRandomPawnDataTag(RandomPawnData->PawnTag);
-				MWGameState->SetPawnTag(RandomPawnData->PawnTag);
+				GameInstance->MappedRandomPawnes.Add(NumericID, RandomPawnData->PawnTag);
 			}
 		}
 	}
@@ -47,6 +51,30 @@ void AMW_GameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 void AMW_GameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
+
+	// get player unique id
+	const FUniqueNetIdRepl& NewPlayerStateUniqueId = NewPlayer->PlayerState->GetUniqueId();
+	if (NewPlayerStateUniqueId.IsValid() && NewPlayerStateUniqueId.IsV1())
+	{
+		if (AMW_GameStateBase* MWGameState = GetGameState<AMW_GameStateBase>())
+		{
+			if (UMW_GameInstance* GameInstance = Cast<UMW_GameInstance>(GetGameInstance()))
+			{
+				uint32 NumericID = GetTypeHash(*NewPlayerStateUniqueId);
+
+				if (GameInstance->MappedRandomPawnes.Contains(NumericID))
+				{
+					MWGameState->AssignPawnData(NumericID, GameInstance->MappedRandomPawnes[NumericID]);
+
+					if (ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(NewPlayer->GetPawn()))
+					{
+						BaseCharacter->ActorID = NumericID;
+						BaseCharacter->PawnTag = GameInstance->MappedRandomPawnes[NumericID];
+					}
+				}
+			}
+		}
+	}
 
 	PlayersNumber++;
 

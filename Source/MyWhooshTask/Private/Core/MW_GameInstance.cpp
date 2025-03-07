@@ -18,7 +18,7 @@
 
 const static FName SERVER_NAME_SETTINGS_KEY = TEXT("ServerName");
 const static FName HOST_NAME_SETTINGS_KEY = TEXT("HostName");
-const static int32 CONNECTION_NUMBER = 2;
+const static int32 CONNECTION_NUMBER = 3;
 
 UMW_GameInstance::UMW_GameInstance(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
