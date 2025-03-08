@@ -26,4 +26,5 @@ public:
 	virtual void Join(uint32 index) = 0;
 	virtual void Quit() = 0;
 	virtual void RequestServerList() = 0;
+	virtual void OnCustomizeColorButtonCLicked(const FLinearColor InColor) = 0;
 };

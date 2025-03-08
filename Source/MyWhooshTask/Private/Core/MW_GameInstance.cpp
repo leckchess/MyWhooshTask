@@ -93,13 +93,27 @@ void UMW_GameInstance::LoadInGameMenu()
 {
 	if (!ensure(InGameMenuWidgetClass.Get() != nullptr)) { return; }
 
-	UInGameMenu* InGameMenuWidget = Cast<UInGameMenu>(CreateWidget(this, InGameMenuWidgetClass));
+	InGameMenuWidget = Cast<UInGameMenu>(CreateWidget(this, InGameMenuWidgetClass));
 
 	if (!ensure(InGameMenuWidget != nullptr)) { return; }
 
 	InGameMenuWidget->SetMenuInterface(this);
 
 	InGameMenuWidget->Setup();
+}
+
+void UMW_GameInstance::OpenPauseMenu()
+{
+	if (InGameMenuWidget == nullptr) { return; }
+
+	InGameMenuWidget->OpenPauseScreen();
+}
+
+void UMW_GameInstance::OpenCustomizationMenu()
+{
+	if (InGameMenuWidget == nullptr) { return; }
+
+	InGameMenuWidget->OpenCustomizationScreen();
 }
 
 void UMW_GameInstance::Host(const FString& ServerName, const FString& HostName)
@@ -172,6 +186,11 @@ void UMW_GameInstance::RequestServerList()
 		SessionSearch->QuerySettings.Set(SEARCH_KEYWORDS, true, EOnlineComparisonOp::Equals);
 		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 	}
+}
+
+void UMW_GameInstance::OnCustomizeColorButtonCLicked(const FLinearColor InColor)
+{
+	OnCustomizeColorButtonCLickedEvent.Broadcast(InColor);
 }
 
 void UMW_GameInstance::OnPlayerLogout(AController* LogoutController)

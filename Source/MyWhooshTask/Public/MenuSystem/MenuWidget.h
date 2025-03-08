@@ -17,8 +17,11 @@ class MYWHOOSHTASK_API UMenuWidget : public UUserWidget
 
 public:
 	void SetMenuInterface(IMenuInterface* InMenuInterface) { MenuInterface = InMenuInterface; }
-	void Setup();
-	void Destroy();
+	virtual void Setup();
+	virtual void Destroy();
+
+	void FocusUI();
+	void ClearFocus();
 
 protected:
 	IMenuInterface* MenuInterface;

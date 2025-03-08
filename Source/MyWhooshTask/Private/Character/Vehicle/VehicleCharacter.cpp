@@ -7,8 +7,10 @@
 #include "EnhancedInput/Public/EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "Net/UnrealNetwork.h"
 #include "ChaosWheeledVehicleMovementComponent.h"
 #include "Core/MW_GameStateBase.h"
+#include "Core/MW_PlayerState.h"
 
 AVehicleCharacter::AVehicleCharacter()
 {
@@ -39,7 +41,22 @@ void AVehicleCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	TryApplyCustomization();
+	if (HasAuthority())
+	{
+		CachedGameState = GetWorld()->GetGameState<AMW_GameStateBase>();
+		OnRep_GameState();
+	}
+}
+
+void AVehicleCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (AMW_PlayerState* MW_PlayerState = Cast<AMW_PlayerState>(GetPlayerState()))
+	{
+		PlayerId = MW_PlayerState->PersistentPlayerID;
+		PlayerTag = MW_PlayerState->PlayerPawnTag;
+	}
 }
 
 void AVehicleCharacter::NotifyControllerChanged()
@@ -79,66 +96,42 @@ void AVehicleCharacter::Look(const FInputActionValue& Value)
 	ChaosVehicleMovement->SetSteeringInput(LookValue);
 }
 
-void AVehicleCharacter::TryApplyCustomization()
+void AVehicleCharacter::OnRep_GameState()
 {
-	if (GetLocalRole() == ROLE_Authority) { return; }
-
-	if (AMW_GameStateBase* MW_GameState = GetWorld()->GetGameState<AMW_GameStateBase>())
+	if (CachedGameState)
 	{
-		//if (MW_GameState->GetPawnTag().IsValid())
-		//{
-		//	ApplyCustomization(MW_GameState->GetCurrentPawnData());
-		//}
-		//else
-		//{
-		//	// in case replication is delayed
-		//	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AVehicleCharacter::TryApplyCustomization);
-		//}
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("GameState Replicated!"));
+
+		FCharacterPawnsData* PawnData = nullptr;
+		if (PlayerTag.IsValid())
+		{
+			PawnData = CachedGameState->GetPawnDataByTag(PlayerTag);
+		}
+		else
+		{
+			PawnData = CachedGameState->GetPawnDataByNetworkId(PlayerId);
+		}
+
+		if (PawnData)
+		{
+			MaterialParameterCollection = GetWorld()->GetParameterCollectionInstance(PawnData->MaterialParameterCollection);
+		}
 	}
 	else
 	{
-		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AVehicleCharacter::TryApplyCustomization);
-	}
-}
-
-void AVehicleCharacter::ApplyCustomization(FCharacterPawnsData* CustomizationData)
-{
-	if (CustomizationData == nullptr) { return; }
-
-	if (USkeletalMeshComponent* SkeletalMeshComp = GetMesh())
-	{
-		if (CustomizationData->OverrideMesh)
-		{
-			SkeletalMeshComp->SetSkeletalMesh(Cast<USkeletalMesh>(CustomizationData->OverrideMesh));
-		}
-
-		if (CustomizationData->OverrideAnimationClass)
-		{
-			SkeletalMeshComp->SetAnimInstanceClass(CustomizationData->OverrideAnimationClass);
-			SkeletalMeshComp->InitAnim(true);
-		}
-
-		if (CustomizationData->bOverridePawnTransform)
-		{
-			SkeletalMeshComp->SetRelativeLocation(CustomizationData->OverrideMeshLocation);
-			SkeletalMeshComp->SetRelativeRotation(FRotator::MakeFromEuler(CustomizationData->OverrideMeshRotation));
-			SkeletalMeshComp->SetRelativeScale3D(CustomizationData->OverideMeshScale);
-		}
-
-		SkeletalMeshComp->RecreateRenderState_Concurrent();
-	}
-
-	if (CustomizationData->bOverrideCameraSetup)
-	{
-		if (CameraBoom)
-		{
-			CameraBoom->TargetArmLength = CustomizationData->OverrideCameraTargetArmLength;
-			CameraBoom->SocketOffset = CustomizationData->OverrideCameraSocketOffset;
-		}
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("GameState is still NULL")));
 	}
 }
 
 UInputMappingContext* AVehicleCharacter::GetDefaultMappingContext() const
 {
 	return DefaultMappingContext;
+}
+
+void AVehicleCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AVehicleCharacter, CachedGameState);
+	DOREPLIFETIME(AVehicleCharacter, PlayerId);
+	DOREPLIFETIME(AVehicleCharacter, PlayerTag);
 }

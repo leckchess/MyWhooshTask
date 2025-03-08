@@ -6,6 +6,7 @@
 #include "WheeledVehiclePawn.h"
 #include "../IMovableInterface.h"
 #include "../ICusomizableInterface.h"
+#include "Core/MW_GameStateBase.h"
 #include "VehicleCharacter.generated.h"
 
 class USpringArmComponent;
@@ -23,26 +24,36 @@ class MYWHOOSHTASK_API AVehicleCharacter : public AWheeledVehiclePawn, public II
 public:
 	AVehicleCharacter();
 
-	virtual void BeginPlay() override;
-
+	/** IIMovableInterface */
 	UInputMappingContext* GetDefaultMappingContext() const override;
-
 	/** map character input to actions */
 	virtual void MapInput(APlayerController* PlayerController) override;
-
 	virtual void Move(const FInputActionValue& Value) override;
 	virtual void Look(const FInputActionValue& Value) override;
 
 
 	/** IICusomizableInterface */
-	void ApplyCustomization(FCharacterPawnsData* CustomizationData) override;
+	class UMaterialParameterCollectionInstance* GetCustomizationMaterialCollection() override { return MaterialParameterCollection; };
+	APawn* GetOwnerPawn() override {return this;}
+
+	UFUNCTION()
+	void OnRep_GameState();
 
 protected:
+	virtual void BeginPlay() override;
+	virtual void PossessedBy(AController* NewController) override;
 	/** called when the controller change (possess/ unpossess) */
 	virtual void NotifyControllerChanged() override;
 
-private:
-	void TryApplyCustomization();
+public:
+	UPROPERTY(ReplicatedUsing = OnRep_GameState)
+	AMW_GameStateBase* CachedGameState;
+
+	UPROPERTY(Replicated)
+	uint32 PlayerId;
+
+	UPROPERTY(Replicated)
+	FGameplayTag PlayerTag;
 
 private:
 	/** Camera Spring Arm Component */
@@ -67,4 +78,7 @@ private:
 
 	/** Chaos Vehicle movement component */
 	TObjectPtr<UChaosWheeledVehicleMovementComponent> ChaosVehicleMovement;
+
+	UPROPERTY()
+	UMaterialParameterCollectionInstance* MaterialParameterCollection;
 };

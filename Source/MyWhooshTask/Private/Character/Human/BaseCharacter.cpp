@@ -6,7 +6,6 @@
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Net/UnrealNetwork.h"
 #include "EnhancedInput/Public/EnhancedInputSubsystems.h"
 
 ABaseCharacter::ABaseCharacter()
@@ -81,11 +80,4 @@ void ABaseCharacter::Look(const FInputActionValue& Value)
 UInputMappingContext* ABaseCharacter::GetDefaultMappingContext() const
 {
 	return DefaultMappingContext;
-}
-
-void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ABaseCharacter, ActorID);
-	DOREPLIFETIME(ABaseCharacter, PawnTag);
 }

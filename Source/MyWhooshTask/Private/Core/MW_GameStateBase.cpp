@@ -23,12 +23,12 @@ FCharacterPawnsData* AMW_GameStateBase::GetPawnDataByTag(const FGameplayTag& InP
 	return CharacterPawns[InPawnTag];
 }
 
-FCharacterPawnsData* AMW_GameStateBase::GetPawnDataByNetworkId(uint64 NetworkId)
+FCharacterPawnsData* AMW_GameStateBase::GetPawnDataByNetworkId(uint32 NetworkId)
 {
 	return GetPawnDataByTag(GetPawnTagByNetworkId(NetworkId));
 }
 
-FGameplayTag AMW_GameStateBase::GetPawnTagByNetworkId(uint64 NetworkId)
+FGameplayTag AMW_GameStateBase::GetPawnTagByNetworkId(uint32 NetworkId)
 {
 	for (const FPawnsMapping& PawnMappingData : PawnsMappingArray)
 	{
@@ -41,7 +41,7 @@ FGameplayTag AMW_GameStateBase::GetPawnTagByNetworkId(uint64 NetworkId)
 	return FGameplayTag{};
 }
 
-void AMW_GameStateBase::AssignPawnData(uint64 NetworkId, FGameplayTag pawnTag)
+void AMW_GameStateBase::AssignPawnData(uint32 NetworkId, FGameplayTag pawnTag)
 {
 	PawnsMappingArray.Add(FPawnsMapping{ NetworkId, pawnTag });
 }

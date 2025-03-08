@@ -9,6 +9,8 @@
 #include "GameplayTagContainer.h"
 #include "MW_GameInstance.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCustomizeColorButtonCLicked, FLinearColor, InColor);
+
 UCLASS()
 class MYWHOOSHTASK_API UMW_GameInstance : public UGameInstance, public IMenuInterface
 {
@@ -25,6 +27,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void LoadInGameMenu();
 
+	UFUNCTION(BlueprintCallable)
+	void OpenPauseMenu();
+
+	UFUNCTION(BlueprintCallable)
+	void OpenCustomizationMenu();
+
 	UFUNCTION(Exec)
 	virtual void Host(const FString& ServerName, const FString& HostName) override;
 
@@ -35,6 +43,8 @@ public:
 	virtual void Quit() override;
 
 	virtual void RequestServerList() override;
+
+	virtual void OnCustomizeColorButtonCLicked(const FLinearColor InColor);
 
 	void OnPlayerLogout(AController* LogoutController);
 
@@ -59,6 +69,9 @@ private:
 	void OnNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type NetworkFailureType, const FString& Message);
 
 public:
+	UPROPERTY()
+	FOnCustomizeColorButtonCLicked OnCustomizeColorButtonCLickedEvent;
+
 	TMap<uint64, FGameplayTag> MappedRandomPawnes;
 
 private:
@@ -66,6 +79,7 @@ private:
 	TSubclassOf<class UUserWidget> InGameMenuWidgetClass;
 
 	class UMainMenu* MainMenuWidget;
+	class UInGameMenu* InGameMenuWidget;
 
 	IOnlineSessionPtr SessionInterface = nullptr;
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch;

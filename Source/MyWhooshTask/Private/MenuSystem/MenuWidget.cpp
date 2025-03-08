@@ -7,6 +7,18 @@ void UMenuWidget::Setup()
 {
 	AddToViewport();
 
+	FocusUI();
+}
+
+void UMenuWidget::Destroy()
+{
+	RemoveFromParent();
+
+	ClearFocus();
+}
+
+void UMenuWidget::FocusUI()
+{
 	UWorld* World = GetWorld();
 	if (World == nullptr) { return; }
 
@@ -20,10 +32,8 @@ void UMenuWidget::Setup()
 	PlayerController->SetShowMouseCursor(true);
 }
 
-void UMenuWidget::Destroy()
+void UMenuWidget::ClearFocus()
 {
-	RemoveFromParent();
-
 	UWorld* World = GetWorld();
 	if (World == nullptr) { return; }
 

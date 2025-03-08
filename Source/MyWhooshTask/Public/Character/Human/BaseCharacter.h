@@ -26,13 +26,6 @@ public:
 	float GeatLeaningValue() { return LeaningValue; }
 	USpringArmComponent* GetCameraBoom() { return CameraBoom; }
 
-	// Unique ID for this pawn, assigned by the Game Mode
-	UPROPERTY(Replicated)
-	uint64 ActorID;
-
-	UPROPERTY(Replicated)
-	FGameplayTag PawnTag;
-
 protected:
 	/** called when the controller change (possess/ unpossess) */
 	virtual void NotifyControllerChanged() override;

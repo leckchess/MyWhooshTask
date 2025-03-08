@@ -18,7 +18,7 @@ struct FPawnsMapping
 public:
 	// Unique identifier for networking (GUID)
 	UPROPERTY(EditAnywhere)
-	uint64 NetworkGUID;
+	uint32 NetworkGUID;
 
 	// Pawn Gameplay tag
 	UPROPERTY(EditAnywhere)
@@ -26,7 +26,7 @@ public:
 
 	FPawnsMapping() {}
 
-	FPawnsMapping(uint64 InNetworkId, FGameplayTag InPawnTag) : NetworkGUID(InNetworkId), GameplayTag(InPawnTag) {}
+	FPawnsMapping(uint32 InNetworkId, FGameplayTag InPawnTag) : NetworkGUID(InNetworkId), GameplayTag(InPawnTag) {}
 };
 
 USTRUCT(BlueprintType)
@@ -41,32 +41,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Pawn")
 	TSubclassOf<APawn> Pawn;
 
-	UPROPERTY(EditAnywhere, Category = "Mesh")
-	USkeletalMesh* OverrideMesh = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = "Mesh")
-	bool bOverridePawnTransform = false;
-
-	UPROPERTY(EditAnywhere, Category = "Mesh", meta = (ToolTip = "Relative", EditCondition = "bOverridePawnTransform", EditConditionHides))
-	FVector OverrideMeshLocation = FVector::ZeroVector;
-
-	UPROPERTY(EditAnywhere, Category = "Mesh", meta = (ToolTip = "Relative", EditCondition = "bOverridePawnTransform", EditConditionHides))
-	FVector OverrideMeshRotation = FVector::ZeroVector;
-
-	UPROPERTY(EditAnywhere, Category = "Mesh", meta = (EditCondition = "bOverridePawnTransform", EditConditionHides))
-	FVector OverideMeshScale = FVector::OneVector;
-
-	UPROPERTY(EditAnywhere, Category = "Animation")
-	TSubclassOf<UAnimInstance> OverrideAnimationClass = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = "Camera")
-	bool bOverrideCameraSetup = false;
-
-	UPROPERTY(EditAnywhere, Category = "Camera", meta = (EditCondition = "bOverrideCameraSetup", EditConditionHides))
-	float OverrideCameraTargetArmLength = 0;
-
-	UPROPERTY(EditAnywhere, Category = "Camera", meta = (EditCondition = "bOverrideCameraSetup", EditConditionHides))
-	FVector OverrideCameraSocketOffset = FVector::ZeroVector;
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	UMaterialParameterCollection* MaterialParameterCollection;
 };
 
 UCLASS()
@@ -78,10 +54,10 @@ public:
 	FCharacterPawnsData* GetRandomPawnData();
 	FCharacterPawnsData* GetPawnDataByTag(const FGameplayTag& PawnTag);
 
-	FCharacterPawnsData* GetPawnDataByNetworkId(uint64 NetworkId);
-	FGameplayTag GetPawnTagByNetworkId(uint64 NetworkId);
+	FCharacterPawnsData* GetPawnDataByNetworkId(uint32 NetworkId);
+	FGameplayTag GetPawnTagByNetworkId(uint32 NetworkId);
 
-	void AssignPawnData(uint64 NetworkId, FGameplayTag pawnTag);
+	void AssignPawnData(uint32 NetworkId, FGameplayTag pawnTag);
 
 	UFUNCTION()
 	void OnRep_PawnsMappingArray();

@@ -7,20 +7,36 @@
 #include "../ICusomizableInterface.h"
 #include "CustomizableCharacter.generated.h"
 
-/**
- * 
- */
+class AMW_GameStateBase;
+
 UCLASS()
 class MYWHOOSHTASK_API ACustomizableCharacter : public ABaseCharacter, public IICusomizableInterface
 {
 	GENERATED_BODY()
-	
-public:
-	virtual void BeginPlay() override;
 
+public:
 	/** IICusomizableInterface */
-	void ApplyCustomization(FCharacterPawnsData* CustomizationData) override;
+	class UMaterialParameterCollectionInstance* GetCustomizationMaterialCollection() override {return MaterialParameterCollection;};
+	APawn* GetOwnerPawn() override { return this; }
+
+	UFUNCTION()
+	void OnRep_GameState();
+
+protected:
+	virtual void BeginPlay() override;
+	virtual void PossessedBy(AController* NewController) override;
+
+public:
+	UPROPERTY(ReplicatedUsing = OnRep_GameState)
+	AMW_GameStateBase* CachedGameState;
+
+	UPROPERTY(Replicated)
+	uint32 PlayerId;
+
+	UPROPERTY(Replicated)
+	FGameplayTag PlayerTag;
 
 private:
-	void TryApplyCustomization();
+	UPROPERTY()
+	UMaterialParameterCollectionInstance* MaterialParameterCollection;
 };
