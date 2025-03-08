@@ -16,11 +16,20 @@ class MYWHOOSHTASK_API ACustomizableCharacter : public ABaseCharacter, public II
 
 public:
 	/** IICusomizableInterface */
-	class UMaterialParameterCollectionInstance* GetCustomizationMaterialCollection() override {return MaterialParameterCollection;};
+	class UMaterialParameterCollection* GetCustomizationMaterialCollection() override {return MaterialParameterCollection;}
 	APawn* GetOwnerPawn() override { return this; }
 
 	UFUNCTION()
 	void OnRep_GameState();
+
+	UFUNCTION()
+	void OnRep_CustomizationColor();
+
+	UFUNCTION(Server,Reliable)
+	void Server_ApplyColorCustomization(FLinearColor NewColor, FGameplayTag PawnTag);	
+
+	UFUNCTION()
+	void OnChangeColorCall(FLinearColor InColor);
 
 protected:
 	virtual void BeginPlay() override;
@@ -36,7 +45,10 @@ public:
 	UPROPERTY(Replicated)
 	FGameplayTag PlayerTag;
 
+	UPROPERTY(ReplicatedUsing = OnRep_CustomizationColor)
+	FLinearColor CustomizationColor;
+
 private:
 	UPROPERTY()
-	UMaterialParameterCollectionInstance* MaterialParameterCollection;
+	UMaterialParameterCollection* MaterialParameterCollection;
 };

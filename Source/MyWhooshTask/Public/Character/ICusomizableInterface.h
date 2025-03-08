@@ -25,7 +25,7 @@ class MYWHOOSHTASK_API IICusomizableInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual void ApplyCustomization() {};
-	virtual class UMaterialParameterCollectionInstance* GetCustomizationMaterialCollection() { return nullptr; }
+	virtual class UMaterialParameterCollection* GetCustomizationMaterialCollection() { return nullptr; }
 	virtual class APawn* GetOwnerPawn() { return nullptr; }
 
 	UFUNCTION()

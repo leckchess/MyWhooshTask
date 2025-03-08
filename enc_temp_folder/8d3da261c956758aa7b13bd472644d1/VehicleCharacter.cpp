@@ -138,11 +138,15 @@ void AVehicleCharacter::OnChangeColorCall(FLinearColor InColor)
 
 void AVehicleCharacter::OnRep_CustomizationColor()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("ApplyColorCustomization OnRep"));
+
 	ApplyColorCustomization(CustomizationColor);
 }
 
 void AVehicleCharacter::Server_ApplyColorCustomization_Implementation(FLinearColor NewColor, FGameplayTag InPawnTag)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("ApplyColorCustomization Server"));
+
 	CustomizationColor = NewColor;
 	if (CachedGameState)
 	{

@@ -72,15 +72,21 @@ void ACustomizableCharacter::OnChangeColorCall(FLinearColor InColor)
 
 void ACustomizableCharacter::OnRep_CustomizationColor()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("ApplyColorCustomization OnRep"));
+
 	ApplyColorCustomization(CustomizationColor);
 }
 
 void ACustomizableCharacter::Server_ApplyColorCustomization_Implementation(FLinearColor NewColor, FGameplayTag InPawnTag)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("ApplyColorCustomization Server"));
+
 	CustomizationColor = NewColor;
 
 	if (CachedGameState)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, FString::Printf(TEXT("GameState Replicated! - %s"), *InPawnTag.ToString()));
+
 		MaterialParameterCollection = CachedGameState->GetPawnDataByTag(InPawnTag)->MaterialParameterCollection;
 		ApplyColorCustomization(CustomizationColor);
 	}
